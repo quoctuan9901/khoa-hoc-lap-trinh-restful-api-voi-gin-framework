@@ -42,6 +42,7 @@ func main() {
 		{
 			categoryHandlerV1 := v1handler.NewCategoryHandler()
 			category.GET("/:category", categoryHandlerV1.GetCategoryByCategoryV1)
+			category.POST("/", categoryHandlerV1.PostCategoriesV1)
 		}
 
 		news := v1.Group("/news")
@@ -49,6 +50,9 @@ func main() {
 			newsHandlerV1 := v1handler.NewNewsHandler()
 			news.GET("/", newsHandlerV1.GetNewsV1)
 			news.GET("/:slug", newsHandlerV1.GetNewsV1)
+			news.POST("/", newsHandlerV1.PostNewsV1)
+			news.POST("/upload-file", newsHandlerV1.PostUploadFileNewsV1)
+			news.POST("/upload-multiple-file", newsHandlerV1.PostUploadMultipleFileNewsV1)
 		}
 	}
 
@@ -64,6 +68,8 @@ func main() {
 			user.DELETE("/:id", userHandlerV2.DeleteUsersV2)
 		}
 	}
+
+	r.StaticFS("/images", gin.Dir("./uploads", false))
 
 	r.Run(":8080")
 }

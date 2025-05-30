@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"log"
 	"net/http"
 	"sync"
 	"time"
@@ -38,11 +37,9 @@ func getRateLimiter(ip string) *rate.Limiter {
 		limiter := rate.NewLimiter(5, 15) // 5 request/sec, brust 10
 		newClient := &Client{limiter, time.Now()}
 		clients[ip] = newClient
-		log.Printf("A clients[%s] - {limiter: %+v, lastSeen: %s}", ip, newClient.limiter, newClient.lastSeen)
 		return limiter
 	}
 
-	log.Printf("A clients[%s] - {limiter: %+v, lastSeen: %s}", ip, client.limiter, client.lastSeen)
 	client.lastSeen = time.Now()
 	return client.limiter
 }
@@ -59,7 +56,6 @@ func CleanupClients() {
 		mu.Unlock()
 	}
 }
-
 
 // ab -n 20 -c 1 -H "X-API-Key:ab2a7a8a-d601-4bf7-b0e2-dd00e5459392" http://localhost:8080/api/v1/categories/golang
 func RateLimitingMiddleware() gin.HandlerFunc {

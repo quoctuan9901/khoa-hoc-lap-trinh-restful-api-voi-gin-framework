@@ -1,6 +1,7 @@
 package v1handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +16,7 @@ type GetCategoryByCategoryV1Param struct {
 }
 
 type PostCategoriesV1Param struct {
-	Name string `form:"name" binding:"required"`
+	Name   string `form:"name" binding:"required"`
 	Status string `form:"status" binding:"required,oneof=1 2"`
 }
 
@@ -29,6 +30,8 @@ func (c *CategoryHandler) GetCategoryByCategoryV1(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, utils.HandleValidationErrors(err))
 		return
 	}
+
+	log.Println("Into GetCategoryByCategoryV1")
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Get category by category (V1)",
@@ -45,7 +48,7 @@ func (c *CategoryHandler) PostCategoriesV1(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Post category (V1)",
-		"name":  params.Name,
+		"name":    params.Name,
 		"status":  params.Status,
 	})
 }

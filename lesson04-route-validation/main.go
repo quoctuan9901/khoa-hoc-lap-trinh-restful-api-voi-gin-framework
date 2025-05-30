@@ -1,19 +1,36 @@
 package main
 
 import (
+	"log"
+
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	v1handler "quoctuan.com/hoc-golang/internal/api/v1/handler"
 	v2handler "quoctuan.com/hoc-golang/internal/api/v2/handler"
+	"quoctuan.com/hoc-golang/middleware"
 	"quoctuan.com/hoc-golang/utils"
 )
 
 func main() {
 
-	r := gin.Default()
-
 	if err := utils.RegisterValidators(); err != nil {
 		panic(err)
 	}
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("No .env file found")
+	}
+
+	r := gin.Default()
+
+	go middleware.CleanupClients()
+
+	r.Use(
+		middleware.LoggerMiddleware(), 
+		middleware.ApiKeyMiddleware(), 
+		middleware.RateLimitingMiddleware(),
+	)
 
 	v1 := r.Group("/api/v1")
 	{
@@ -49,7 +66,7 @@ func main() {
 		{
 			newsHandlerV1 := v1handler.NewNewsHandler()
 			news.GET("/", newsHandlerV1.GetNewsV1)
-			news.GET("/:slug", newsHandlerV1.GetNewsV1)
+			news.GET("/:slug", middleware.SimpleMiddleware(), newsHandlerV1.GetNewsV1)
 			news.POST("/", newsHandlerV1.PostNewsV1)
 			news.POST("/upload-file", newsHandlerV1.PostUploadFileNewsV1)
 			news.POST("/upload-multiple-file", newsHandlerV1.PostUploadMultipleFileNewsV1)

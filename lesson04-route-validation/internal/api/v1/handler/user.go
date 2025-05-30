@@ -1,6 +1,7 @@
 package v1handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -32,6 +33,8 @@ func (u *UserHandler) GetUsersByIdV1(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, utils.HandleValidationErrors(err))
 		return
 	}
+
+	log.Println("Into GetUsersByIdV1")
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Get user by ID (V1)",

@@ -33,9 +33,15 @@ func (c *CategoryHandler) GetCategoryByCategoryV1(ctx *gin.Context) {
 
 	log.Println("Into GetCategoryByCategoryV1")
 
+	value, exist := ctx.Get("username")
+	if !exist {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Missing username"})
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "Get category by category (V1)",
 		"course":  params.Category,
+		"username": value,
 	})
 }
 

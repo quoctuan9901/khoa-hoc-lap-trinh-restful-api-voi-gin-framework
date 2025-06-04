@@ -19,8 +19,13 @@ func NewUserService(repo repository.UserRepository) UserService {
 	}
 }
 
-func (us *userService) GetAllUsers() {
+func (us *userService) GetAllUsers() ([]models.User, error) {
+	users, err := us.repo.FindAll()
+	if err != nil {
+		return nil, utils.WrapError(err, "failed to fetch users", utils.ErrCodeInternal)
+	}
 
+	return users, nil
 }
 
 func (us *userService) CreateUser(user models.User) (models.User, error) {
@@ -46,8 +51,13 @@ func (us *userService) CreateUser(user models.User) (models.User, error) {
 	return user, nil
 }
 
-func (us *userService) GetUserByUUID() {
+func (us *userService) GetUserByUUID(uuid string) (models.User, error) {
+	user, found := us.repo.FindByUUID(uuid)
+	if !found {
+		return models.User{}, utils.NewError("user not found", utils.ErrCodeNotFound)
+	}
 
+	return user, nil
 }
 
 func (us *userService) UpdateUser() {

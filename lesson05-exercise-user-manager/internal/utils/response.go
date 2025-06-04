@@ -65,8 +65,12 @@ func ResponseError(ctx *gin.Context, err error) {
 func ResponseSuccess(ctx *gin.Context, status int, data any) {
 	ctx.JSON(status, gin.H{
 		"status": "success",
-		"data": data,
+		"data":   data,
 	})
+}
+
+func ResponseValidator(ctx *gin.Context, data any) {
+	ctx.JSON(http.StatusBadRequest, data)
 }
 
 func httpStatusFromCode(code ErrorCode) int {

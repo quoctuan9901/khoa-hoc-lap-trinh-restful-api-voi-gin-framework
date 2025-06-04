@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"fmt"
 	"user-management-api/internal/models"
 )
 
@@ -33,8 +34,15 @@ func (ur *InMemoryUserRepository) FindByUUID(uuid string) (models.User, bool) {
 	return models.User{}, false
 }
 
-func (ur *InMemoryUserRepository) Update() {
+func (ur *InMemoryUserRepository) Update(uuid string, user models.User) error {
+	for i, u := range ur.users {
+		if u.UUID == uuid {
+			ur.users[i] = user
+			return nil
+		}
+	}
 
+	return fmt.Errorf("user not found")
 }
 
 func (ur *InMemoryUserRepository) Delete() {

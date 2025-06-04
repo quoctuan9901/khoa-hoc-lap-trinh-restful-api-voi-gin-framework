@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 	"user-management-api/internal/dto"
-	"user-management-api/internal/models"
 	"user-management-api/internal/service"
 	"user-management-api/internal/utils"
 	"user-management-api/internal/validation"
@@ -58,11 +57,13 @@ func (uh *UserHandler) GetAllUsers(ctx *gin.Context) {
 }
 
 func (uh *UserHandler) CreateUser(ctx *gin.Context) {
-	var user models.User
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	var input dto.CreateUserInput
+	if err := ctx.ShouldBindJSON(&input); err != nil {
 		utils.ResponseValidator(ctx, validation.HandleValidationErrors(err))
 		return
 	}
+
+	user := input.MapCreateInputToModel()
 
 	createdUser, err := uh.service.CreateUser(user)
 	if err != nil {
@@ -100,11 +101,13 @@ func (uh *UserHandler) UpdateUser(ctx *gin.Context) {
 		return
 	}
 
-	var user models.User
-	if err := ctx.ShouldBindJSON(&user); err != nil {
+	var input dto.UpdateUserInput
+	if err := ctx.ShouldBindJSON(&input); err != nil {
 		utils.ResponseValidator(ctx, validation.HandleValidationErrors(err))
 		return
 	}
+
+	user := input.MapUpdateInputToModel()
 
 	updatedUser, err := uh.service.UpdateUser(params.Uuid, user)
 	if err != nil {

@@ -42,7 +42,7 @@ func (us *userService) GetAllUsers(search string, page, limit int) ([]models.Use
 	}
 
 	start := (page - 1) * limit
-	if  start >= len(filteredUsers) {
+	if start >= len(filteredUsers) {
 		return []models.User{}, nil
 	}
 
@@ -120,6 +120,10 @@ func (us *userService) UpdateUser(uuid string, updatedUser models.User) (models.
 	return currentUser, nil
 }
 
-func (us *userService) DeleteUser() {
+func (us *userService) DeleteUser(uuid string) error {
+	if err := us.repo.Delete(uuid); err != nil {
+		return utils.WrapError(err, "faild to hash password", utils.ErrCodeInternal)
+	}
 
+	return nil
 }

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"fmt"
+	"slices"
 	"user-management-api/internal/models"
 )
 
@@ -45,8 +46,15 @@ func (ur *InMemoryUserRepository) Update(uuid string, user models.User) error {
 	return fmt.Errorf("user not found")
 }
 
-func (ur *InMemoryUserRepository) Delete() {
+func (ur *InMemoryUserRepository) Delete(uuid string) error {
+	for i, u := range ur.users {
+		if u.UUID == uuid {
+			ur.users = slices.Delete(ur.users, i, i+1)
+			return nil
+		}
+	}
 
+	return fmt.Errorf("user not found")
 }
 
 func (ur *InMemoryUserRepository) FindByEmail(email string) (models.User, bool) {

@@ -20,11 +20,9 @@ func main() {
 		log.Fatal("unable to connnect to db")
 	}
 
-	log.Println(db.DB)
-
 	r := gin.Default()
 
-	userRepository := repository.NewSQLUserRepository()
+	userRepository := repository.NewSQLUserRepository(db.DB)
 	userHandler := handlers.NewUserHandler(userRepository)
 
 	r.GET("/api/v1/users/:id", userHandler.GetUserById)

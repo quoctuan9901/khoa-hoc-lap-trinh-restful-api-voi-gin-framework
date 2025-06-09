@@ -16,9 +16,7 @@ func main() {
 		log.Println("No .env file found")
 	}
 
-	if err := db.InitDB(); err != nil {
-		log.Fatal(err)
-	}
+	db.InitDB()
 
 	log.Println(db.DB)
 

@@ -23,7 +23,7 @@ func (w *CustomResponseWriter) Write(data []byte) (n int, err error) {
 	return w.ResponseWriter.Write(data)
 }
 
-func LoggerMiddleware(httpLogger zerolog.Logger) gin.HandlerFunc {
+func LoggerMiddleware(httpLogger *zerolog.Logger) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		start := time.Now()
 		contentType := ctx.GetHeader("Content-Type")

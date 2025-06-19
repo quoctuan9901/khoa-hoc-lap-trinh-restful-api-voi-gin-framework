@@ -1,0 +1,59 @@
+{
+    "level": "error",
+    "method": "GET",
+    "path": "/api/v1/users/panic",
+    "query": "",
+    "client_ip": "::1",
+    "user_agent": "PostmanRuntime/7.44.1",
+    "referer": "",
+    "protocol": "HTTP/1.1",
+    "host": "localhost:8080",
+    "remote_addr": "[::1]:57479",
+    "request_uri": "/api/v1/users/panic",
+    "content_length": 150,
+    "headers": {
+        "Accept": [
+            "*/*"
+        ],
+        "Accept-Encoding": [
+            "gzip, deflate, br"
+        ],
+        "Cache-Control": [
+            "no-cache"
+        ],
+        "Connection": [
+            "keep-alive"
+        ],
+        "Content-Length": [
+            "150"
+        ],
+        "Content-Type": [
+            "application/json"
+        ],
+        "Postman-Token": [
+            "42f19ca9-72dc-4a56-9097-501e03419253"
+        ],
+        "User-Agent": [
+            "PostmanRuntime/7.44.1"
+        ],
+        "X-Api-Key": [
+            "894f5978-f86b-4b04-9bc0-328e7ac6166e"
+        ]
+    },
+    "request_body": {
+        "age": 40,
+        "email": "contact.quoctuan@gmail.com",
+        "level": 1,
+        "name": "Vu Quoc Tuan",
+        "password": "A@a123456",
+        "status": 1
+    },
+    "status_code": 500,
+    "response_body": {
+        "code": "INTERNAL_SERVER_ERROR",
+        "message": "Please try again later."
+    },
+    "duration_ms": 0,
+    "time": "2025-06-19T11:22:53+07:00",
+    "message": "HTTP Request Log"
+}{"level":"error","method":"GET","path":"/api/v1/users/panic","query":"","client_ip":"::1","user_agent":"PostmanRuntime/7.44.1","referer":"","protocol":"HTTP/1.1","host":"localhost:8080","remote_addr":"[::1]:57495","request_uri":"/api/v1/users/panic","content_length":150,"headers":{"Accept":["*/*"],"Accept-Encoding":["gzip, deflate, br"],"Cache-Control":["no-cache"],"Connection":["keep-alive"],"Content-Length":["150"],"Content-Type":["application/json"],"Postman-Token":["f738373e-6a65-45d1-82af-97ac8f36c138"],"User-Agent":["PostmanRuntime/7.44.1"],"X-Api-Key":["894f5978-f86b-4b04-9bc0-328e7ac6166e"]},"request_body":{"age":40,"email":"contact.quoctuan@gmail.com","level":1,"name":"Vu Quoc Tuan","password":"A@a123456","status":1},"status_code":500,"response_body":{"code":"INTERNAL_SERVER_ERROR","message":"Please try again later."},"duration_ms":0,"time":"2025-06-19T11:27:24+07:00","message":"HTTP Request Log"}

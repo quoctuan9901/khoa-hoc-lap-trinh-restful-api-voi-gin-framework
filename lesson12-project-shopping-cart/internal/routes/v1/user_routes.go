@@ -24,5 +24,6 @@ func (ur *UserRoutes) Register(r *gin.RouterGroup) {
 		users.GET("/:uuid", ur.handler.GetUserByUUID)
 		users.PUT("/:uuid", ur.handler.UpdateUser)
 		users.DELETE("/:uuid", ur.handler.DeleteUser)
+		users.GET("/panic", ur.handler.PanicUser)
 	}
 }

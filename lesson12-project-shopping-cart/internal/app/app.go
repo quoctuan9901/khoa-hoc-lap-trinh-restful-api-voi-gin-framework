@@ -1,7 +1,13 @@
 package app
 
 import (
+	"context"
 	"log"
+	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 	"user-management-api/internal/config"
 	"user-management-api/internal/routes"
 	"user-management-api/internal/validation"
@@ -15,8 +21,8 @@ type Module interface {
 }
 
 type Application struct {
-	config *config.Config
-	router *gin.Engine
+	config  *config.Config
+	router  *gin.Engine
 	modules []Module
 }
 
@@ -36,14 +42,41 @@ func NewApplication(cfg *config.Config) *Application {
 	routes.RegisterRoutes(r, getModulRoutes(modules)...)
 
 	return &Application{
-		config: cfg,
-		router: r,
+		config:  cfg,
+		router:  r,
 		modules: modules,
 	}
 }
 
 func (a *Application) Run() error {
-	return a.router.Run(a.config.ServerAddress)
+	srv := &http.Server{
+		Addr:    a.config.ServerAddress,
+		Handler: a.router,
+	}
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM, syscall.SIGHUP)
+
+	go func() {
+		log.Printf("✅ Server is running at %s \n", a.config.ServerAddress)
+		if err := srv.ListenAndServe(); err != http.ErrServerClosed {
+			log.Fatalf("⛔️ Failed to start server: %v", err)
+		}
+	}()
+
+	<-quit
+	log.Println("⚠️  Shutdown signal received ...")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("⛔️ Server forced to shutdown: %v", err)
+	}
+
+	log.Println("🍺 Server exited gracefully")
+
+	return nil
 }
 
 func getModulRoutes(modules []Module) []routes.Route {

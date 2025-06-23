@@ -21,6 +21,11 @@ func NormalizeString(text string) string {
 }
 
 func ConvertToInt32Pointer(value int) *int32 {
+	if value == 0 {
+		return nil
+	}
+
 	v := int32(value)
+	
 	return &v
 }

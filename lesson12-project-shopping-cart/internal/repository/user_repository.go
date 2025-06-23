@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 	"user-management-api/internal/db/sqlc"
 )
 
@@ -19,9 +18,6 @@ func NewSqlUserRepository(db sqlc.Querier) UserRepository {
 func (ur *SqlUserRepository) FindAll() {}
 
 func (ur *SqlUserRepository) Create(ctx context.Context, userParams sqlc.CreateUserParams) (sqlc.User, error) {
-	log.Printf("%+v", userParams)
-	log.Printf("%+v", ur.db)
-
 	user, err := ur.db.CreateUser(ctx, userParams)
 	if err != nil {
 		return sqlc.User{}, err

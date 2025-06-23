@@ -6,13 +6,10 @@ package sqlc
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 type Querier interface {
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
-	GetUser(ctx context.Context, argUuid uuid.UUID) (User, error)
 }
 
 var _ Querier = (*Queries)(nil)

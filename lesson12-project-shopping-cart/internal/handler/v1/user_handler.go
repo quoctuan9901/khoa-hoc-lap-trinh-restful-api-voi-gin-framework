@@ -1,7 +1,6 @@
 package v1handler
 
 import (
-	"fmt"
 	"net/http"
 	v1dto "user-management-api/internal/dto/v1"
 	v1service "user-management-api/internal/service/v1"
@@ -56,7 +55,16 @@ func (uh *UserHandler) CreateUser(ctx *gin.Context) {
 		return
 	}
 
-	utils.ResponseSuccess(ctx, http.StatusCreated, "")
+	user := input.MapCreateInputToModel()
+
+	createdUser, err := uh.service.CreateUser(ctx, user)
+	if err != nil {
+		utils.ResponseError(ctx, err)
+	}
+
+	userDTO := v1dto.MapUserToDTO(createdUser)
+
+	utils.ResponseSuccess(ctx, http.StatusCreated, userDTO)
 }
 
 func (uh *UserHandler) GetUserByUUID(ctx *gin.Context) {
@@ -93,9 +101,4 @@ func (uh *UserHandler) DeleteUser(ctx *gin.Context) {
 	}
 
 	utils.ResponseStatusCode(ctx, http.StatusNoContent)
-}
-
-func (uh *UserHandler) PanicUser(ctx *gin.Context) {
-	var a []int
-	fmt.Println(a[1])
 }

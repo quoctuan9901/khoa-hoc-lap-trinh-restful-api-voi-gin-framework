@@ -11,8 +11,80 @@ sql:
         emit_json_tags: true
         emit_interface: true
         emit_empty_slices: true
+        emit_pointers_for_null_types: true
         overrides:
-          - db_type: "uuid"
-            go_type: "github.com/google/uuid.UUID"
+          # ==== Textual types (non-nullable & nullable) ====
+          - db_type: "text"
+            go_type: "string"
+          - db_type: "text"
+            go_type: "string"
+            nullable: true
+
+          - db_type: "varchar"
+            go_type: "string"
+          - db_type: "varchar"
+            go_type: "string"
+            nullable: true
+
+          - db_type: "char"
+            go_type: "string"
+
+          # ==== Boolean ====
+          - db_type: "bool"
+            go_type: "bool"
+
+          # ==== Integers ====
+          - db_type: "int2"
+            go_type: "int16"
+          - db_type: "int2"
+            go_type: "int16"
+            nullable: true
+          - db_type: "int4"
+            go_type: "int32"
+          - db_type: "int4"
+            go_type: "int32"
+            nullable: true
+          - db_type: "int8"
+            go_type: "int64"
+          - db_type: "int8"
+            go_type: "int64"
+            nullable: true
+          - db_type: "serial"
+            go_type: "int32"
+          - db_type: "bigserial"
+            go_type: "int64"
+
+          # ==== Floating Points ====
+          - db_type: "float4"
+            go_type: "float32"
+          - db_type: "float4"
+            go_type: "float32"
+            nullable: true
+          - db_type: "float8"
+            go_type: "float64"
+          - db_type: "float8"
+            go_type: "float64"
+            nullable: true
+          - db_type: "numeric"
+            go_type: "float64" # Dùng string nếu cần độ chính xác cao
+
+          # ==== Time and Date ====
           - db_type: "timestamptz"
             go_type: "time.Time"
+          - db_type: "timestamptz"
+            go_type: "time.Time"
+            nullable: true
+          - db_type: "timestamp"
+            go_type: "time.Time"
+          - db_type: "date"
+            go_type: "time.Time"
+
+          # ==== JSON ====
+          - db_type: "json"
+            go_type: "encoding/json.RawMessage"
+          - db_type: "jsonb"
+            go_type: "encoding/json.RawMessage"
+
+          # ==== UUID ====
+          - db_type: "uuid"
+            go_type: "github.com/google/uuid.UUID"

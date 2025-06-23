@@ -7,45 +7,52 @@ package sqlc
 
 import (
 	"context"
-
-	"github.com/google/uuid"
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users(name, email) VALUES ($1, $2) RETURNING user_id, uuid, name, email, created_at
+INSERT INTO users (
+    user_email,
+    user_password,
+    user_fullname,
+    user_age,
+    user_status,
+    user_level
+) VALUES (
+    $1, $2, $3, $4, $5, $6
+) RETURNING user_id, user_uuid, user_email, user_password, user_fullname, user_age, user_status, user_level, user_deleted_at, user_created_at, user_updated_at
 `
 
 type CreateUserParams struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	UserEmail    string `json:"user_email"`
+	UserPassword string `json:"user_password"`
+	UserFullname string `json:"user_fullname"`
+	UserAge      *int32 `json:"user_age"`
+	UserStatus   int32  `json:"user_status"`
+	UserLevel    int32  `json:"user_level"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Name, arg.Email)
-	var i User
-	err := row.Scan(
-		&i.UserID,
-		&i.Uuid,
-		&i.Name,
-		&i.Email,
-		&i.CreatedAt,
+	row := q.db.QueryRow(ctx, createUser,
+		arg.UserEmail,
+		arg.UserPassword,
+		arg.UserFullname,
+		arg.UserAge,
+		arg.UserStatus,
+		arg.UserLevel,
 	)
-	return i, err
-}
-
-const getUser = `-- name: GetUser :one
-SELECT user_id, uuid, name, email, created_at FROM users WHERE uuid = $1
-`
-
-func (q *Queries) GetUser(ctx context.Context, argUuid uuid.UUID) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, argUuid)
 	var i User
 	err := row.Scan(
 		&i.UserID,
-		&i.Uuid,
-		&i.Name,
-		&i.Email,
-		&i.CreatedAt,
+		&i.UserUuid,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullname,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
+		&i.UserDeletedAt,
+		&i.UserCreatedAt,
+		&i.UserUpdatedAt,
 	)
 	return i, err
 }

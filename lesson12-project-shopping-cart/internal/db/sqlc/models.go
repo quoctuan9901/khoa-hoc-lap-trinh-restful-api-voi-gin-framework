@@ -11,9 +11,19 @@ import (
 )
 
 type User struct {
-	UserID    int32     `json:"user_id"`
-	Uuid      uuid.UUID `json:"uuid"`
-	Name      string    `json:"name"`
-	Email     string    `json:"email"`
-	CreatedAt time.Time `json:"created_at"`
+	UserID       int32     `json:"user_id"`
+	UserUuid     uuid.UUID `json:"user_uuid"`
+	UserEmail    string    `json:"user_email"`
+	UserPassword string    `json:"user_password"`
+	UserFullname string    `json:"user_fullname"`
+	// User age, must be between 1 and 150
+	UserAge *int32 `json:"user_age"`
+	// User status: 1 - Active, 2 - Inactive, 3 - Banned
+	UserStatus int32 `json:"user_status"`
+	// User level: 1 - Administrator, 2 - Moderator, 3 - Member
+	UserLevel int32 `json:"user_level"`
+	// Soft delete timestamp: NULL means not deleted
+	UserDeletedAt time.Time `json:"user_deleted_at"`
+	UserCreatedAt time.Time `json:"user_created_at"`
+	UserUpdatedAt time.Time `json:"user_updated_at"`
 }

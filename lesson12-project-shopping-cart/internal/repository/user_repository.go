@@ -20,6 +20,7 @@ func (ur *SqlUserRepository) FindAll() {}
 
 func (ur *SqlUserRepository) Create(ctx context.Context, userParams sqlc.CreateUserParams) (sqlc.User, error) {
 	log.Printf("%+v", userParams)
+	log.Printf("%+v", ur.db)
 
 	user, err := ur.db.CreateUser(ctx, userParams)
 	if err != nil {

@@ -1,11 +1,13 @@
 package v1service
 
 import (
+	"errors"
 	"user-management-api/internal/db/sqlc"
 	"user-management-api/internal/repository"
 	"user-management-api/internal/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5/pgconn"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -35,6 +37,11 @@ func (us *userService) CreateUser(ctx *gin.Context, input sqlc.CreateUserParams)
 
 	user, err := us.repo.Create(context, input)
 	if err != nil {
+		var pgErr *pgconn.PgError
+		if errors.As(err, &pgErr) && pgErr.Code == "23505" {
+			return sqlc.User{}, utils.NewError("email already exist", utils.ErrCodeConflict)
+		}
+
 		return sqlc.User{}, utils.WrapError(err, "failed to create a new user", utils.ErrCodeInternal)
 	}
 

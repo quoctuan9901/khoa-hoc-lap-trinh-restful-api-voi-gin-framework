@@ -18,10 +18,10 @@ type UserDTO struct {
 type CreateUserInput struct {
 	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required,email,email_advanced"`
-	Age      int    `json:"age" binding:"required,gt=0"`
+	Age      int    `json:"age" binding:"omitempty,gt=0"`
 	Password string `json:"password" binding:"required,min=8,password_strong"`
-	Status   int    `json:"status" binding:"required,oneof=1 2"`
-	Level    int    `json:"level" binding:"required,oneof=1 2"`
+	Status   int    `json:"status" binding:"required,oneof=1 2 3"`
+	Level    int    `json:"level" binding:"required,oneof=1 2 3"`
 }
 
 type UpdateUserInput struct {
@@ -62,15 +62,23 @@ func MapUserToDTO(user sqlc.User) *UserDTO {
 		dto.Age = int(*user.UserAge)
 	}
 
+	// if user.UserDeletedAt.Valid {
+	// 	dto.DeletedAt = user.UserDeletedAt.Time.Format("2006-01-02 15:04:05")
+	// } else {
+	// 	dto.DeletedAt = ""
+	// }
+
 	return dto
 }
 
 func mapStatusText(status int) string {
 	switch status {
 	case 1:
-		return "Show"
+		return "Active"
 	case 2:
-		return "Hide"
+		return "Inactive"
+	case 3:
+		return "Banned"
 	default:
 		return "None"
 	}
@@ -79,8 +87,10 @@ func mapStatusText(status int) string {
 func mapLevelText(status int) string {
 	switch status {
 	case 1:
-		return "Admin"
+		return "Administrator"
 	case 2:
+		return "Moderator"
+	case 3:
 		return "Member"
 	default:
 		return "None"

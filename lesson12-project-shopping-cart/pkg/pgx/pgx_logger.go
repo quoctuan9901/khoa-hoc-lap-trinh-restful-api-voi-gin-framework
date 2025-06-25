@@ -7,6 +7,7 @@ import (
 	"regexp"
 	"strings"
 	"time"
+	"user-management-api/pkg/logger"
 
 	"github.com/jackc/pgx/v5/tracelog"
 	"github.com/rs/zerolog"
@@ -103,6 +104,7 @@ func (t *PgxZerologTracer) Log(ctx context.Context, level tracelog.LogLevel, msg
 	}
 
 	baseLogger := t.Logger.With().
+		Str("trace_id", logger.GetTraceID(ctx)).
 		Dur("duration", duration).
 		Str("sql_original", queryInfo.OriginalSQL).
 		Str("sql", finalSQL).

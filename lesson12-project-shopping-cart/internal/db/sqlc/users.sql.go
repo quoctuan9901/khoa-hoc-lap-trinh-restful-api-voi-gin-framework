@@ -7,6 +7,8 @@ package sqlc
 
 import (
 	"context"
+
+	"github.com/google/uuid"
 )
 
 const createUser = `-- name: CreateUser :one
@@ -39,6 +41,55 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.UserAge,
 		arg.UserStatus,
 		arg.UserLevel,
+	)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.UserUuid,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullname,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
+		&i.UserDeletedAt,
+		&i.UserCreatedAt,
+		&i.UserUpdatedAt,
+	)
+	return i, err
+}
+
+const updateUser = `-- name: UpdateUser :one
+UPDATE users
+SET
+    user_password = COALESCE($1, user_password),
+    user_fullname = COALESCE($2, user_fullname),
+    user_age = COALESCE($3, user_age),
+    user_status = COALESCE($4, user_status),
+    user_level = COALESCE($5, user_level)
+WHERE
+    user_uuid = $6
+    AND user_deleted_at IS NULL
+RETURNING user_id, user_uuid, user_email, user_password, user_fullname, user_age, user_status, user_level, user_deleted_at, user_created_at, user_updated_at
+`
+
+type UpdateUserParams struct {
+	UserPassword *string   `json:"user_password"`
+	UserFullname *string   `json:"user_fullname"`
+	UserAge      *int32    `json:"user_age"`
+	UserStatus   *int32    `json:"user_status"`
+	UserLevel    *int32    `json:"user_level"`
+	UserUuid     uuid.UUID `json:"user_uuid"`
+}
+
+func (q *Queries) UpdateUser(ctx context.Context, arg UpdateUserParams) (User, error) {
+	row := q.db.QueryRow(ctx, updateUser,
+		arg.UserPassword,
+		arg.UserFullname,
+		arg.UserAge,
+		arg.UserStatus,
+		arg.UserLevel,
+		arg.UserUuid,
 	)
 	var i User
 	err := row.Scan(

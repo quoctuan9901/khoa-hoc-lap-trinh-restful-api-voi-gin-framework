@@ -21,6 +21,12 @@ type AppError struct {
 	Err     error
 }
 
+type APIResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message,omitempty"`
+	Data    any    `json:"data,omitempty"`
+}
+
 func (ae *AppError) Error() string {
 	return ""
 }
@@ -44,7 +50,7 @@ func ResponseError(ctx *gin.Context, err error) {
 	if appErr, ok := err.(*AppError); ok {
 		status := httpStatusFromCode(appErr.Code)
 		response := gin.H{
-			"error": appErr.Message,
+			"error": CapitalizeFirst(appErr.Message),
 			"code":  appErr.Code,
 		}
 
@@ -62,11 +68,17 @@ func ResponseError(ctx *gin.Context, err error) {
 	})
 }
 
-func ResponseSuccess(ctx *gin.Context, status int, data any) {
-	ctx.JSON(status, gin.H{
-		"status": "success",
-		"data":   data,
-	})
+func ResponseSuccess(ctx *gin.Context, status int, message string, data ...any) {
+	resp := APIResponse{
+		Status:  "success",
+		Message: CapitalizeFirst(message),
+	}
+
+	if len(data) > 0 && data[0] != nil {
+		resp.Data = data[0]
+	}
+
+	ctx.JSON(status, resp)
 }
 
 func ResponseStatusCode(ctx *gin.Context, status int) {

@@ -14,17 +14,25 @@ import (
 const countUsers = `-- name: CountUsers :one
 SELECT count(*)
 FROM users
-WHERE user_deleted_at IS NULL
-AND (
-    $1::TEXT IS NULL
-    OR $1::TEXT = ''
-    OR user_email ILIKE '%' || $1 || '%'
-    OR user_fullname ILIKE '%' || $1 || '%'
+WHERE (
+    $1::bool IS NULL
+    OR ($1::bool = TRUE AND user_deleted_at IS NOT NULL)
+    OR ($1::bool = FALSE AND user_deleted_at IS NULL)
+) AND (
+    $2::TEXT IS NULL
+    OR $2::TEXT = ''
+    OR user_email ILIKE '%' || $2 || '%'
+    OR user_fullname ILIKE '%' || $2 || '%'
 )
 `
 
-func (q *Queries) CountUsers(ctx context.Context, search string) (int64, error) {
-	row := q.db.QueryRow(ctx, countUsers, search)
+type CountUsersParams struct {
+	Deleted *bool  `json:"deleted"`
+	Search  string `json:"search"`
+}
+
+func (q *Queries) CountUsers(ctx context.Context, arg CountUsersParams) (int64, error) {
+	row := q.db.QueryRow(ctx, countUsers, arg.Deleted, arg.Search)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -61,6 +69,31 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 		arg.UserStatus,
 		arg.UserLevel,
 	)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.UserUuid,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullname,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
+		&i.UserDeletedAt,
+		&i.UserCreatedAt,
+		&i.UserUpdatedAt,
+	)
+	return i, err
+}
+
+const getUser = `-- name: GetUser :one
+SELECT user_id, user_uuid, user_email, user_password, user_fullname, user_age, user_status, user_level, user_deleted_at, user_created_at, user_updated_at FROM users
+WHERE user_deleted_at IS NULL
+AND user_uuid = $1
+`
+
+func (q *Queries) GetUser(ctx context.Context, userUuid uuid.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUser, userUuid)
 	var i User
 	err := row.Scan(
 		&i.UserID,

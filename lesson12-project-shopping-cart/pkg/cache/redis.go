@@ -44,9 +44,9 @@ func (cs *RedisCacheService) Set(key string, value any, ttl time.Duration) error
 }
 
 func (cs *RedisCacheService) Clear(pattern string) error {
-	cusor := uint64(0)
+	cursor := uint64(0)
 	for {
-		keys, nextCursor, err := cs.rdb.Scan(cs.ctx, cusor, pattern, 2).Result()
+		keys, nextCursor, err := cs.rdb.Scan(cs.ctx, cursor, pattern, 2).Result()
 		if err != nil {
 			return err
 		}
@@ -55,9 +55,9 @@ func (cs *RedisCacheService) Clear(pattern string) error {
 			cs.rdb.Del(cs.ctx, keys...)
 		}
 
-		cusor = nextCursor
+		cursor = nextCursor
 
-		if cusor == 0 {
+		if cursor == 0 {
 			break
 		}
 	}

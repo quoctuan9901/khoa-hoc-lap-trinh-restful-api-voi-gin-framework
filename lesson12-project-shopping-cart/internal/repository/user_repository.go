@@ -188,4 +188,12 @@ func (ur *SqlUserRepository) Delete(ctx context.Context, uuid uuid.UUID) (sqlc.U
 	return user, nil
 }
 
-func (ur *SqlUserRepository) FindByEmail(email string) {}
+func (ur *SqlUserRepository) GetByEmail(ctx context.Context, email string)  (sqlc.User, error) {
+	user, err := ur.db.GetUserByEmail(ctx, email)
+	if err != nil {
+		return sqlc.User{}, err
+	}
+
+	return user, nil
+
+}

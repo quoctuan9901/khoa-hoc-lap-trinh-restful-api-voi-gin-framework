@@ -111,6 +111,31 @@ func (q *Queries) GetUser(ctx context.Context, userUuid uuid.UUID) (User, error)
 	return i, err
 }
 
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT user_id, user_uuid, user_email, user_password, user_fullname, user_age, user_status, user_level, user_deleted_at, user_created_at, user_updated_at FROM users
+WHERE user_deleted_at IS NULL
+AND user_email = $1
+`
+
+func (q *Queries) GetUserByEmail(ctx context.Context, userEmail string) (User, error) {
+	row := q.db.QueryRow(ctx, getUserByEmail, userEmail)
+	var i User
+	err := row.Scan(
+		&i.UserID,
+		&i.UserUuid,
+		&i.UserEmail,
+		&i.UserPassword,
+		&i.UserFullname,
+		&i.UserAge,
+		&i.UserStatus,
+		&i.UserLevel,
+		&i.UserDeletedAt,
+		&i.UserCreatedAt,
+		&i.UserUpdatedAt,
+	)
+	return i, err
+}
+
 const listUsersUserCreatedAtAsc = `-- name: ListUsersUserCreatedAtAsc :many
 SELECT user_id, user_uuid, user_email, user_password, user_fullname, user_age, user_status, user_level, user_deleted_at, user_created_at, user_updated_at
 FROM users

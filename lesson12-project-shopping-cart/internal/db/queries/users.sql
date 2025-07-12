@@ -53,6 +53,11 @@ SELECT * FROM users
 WHERE user_deleted_at IS NULL
 AND user_uuid = $1;
 
+-- name: GetUserByEmail :one
+SELECT * FROM users
+WHERE user_deleted_at IS NULL
+AND user_email = $1;
+
 -- name: CountUsers :one
 SELECT count(*)
 FROM users

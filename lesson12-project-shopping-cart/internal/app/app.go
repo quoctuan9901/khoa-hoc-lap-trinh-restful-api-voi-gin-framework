@@ -61,7 +61,7 @@ func NewApplication(cfg *config.Config) *Application {
 		NewAuthModule(ctx, tokenService),
 	}
 
-	routes.RegisterRoutes(r, getModulRoutes(modules)...)
+	routes.RegisterRoutes(r, tokenService, getModulRoutes(modules)...)
 
 	return &Application{
 		config:  cfg,

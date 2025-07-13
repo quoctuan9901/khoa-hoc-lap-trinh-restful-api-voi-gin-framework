@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"encoding/json"
 	"time"
 	"user-management-api/internal/db/sqlc"
 	"user-management-api/internal/utils"
@@ -12,14 +13,16 @@ import (
 type JWTService struct {
 }
 
-type Claims struct {
+type EncryptedPayload struct {
 	UserUUID string `json:"user_uuid"`
 	Email    string `json:"email"`
 	Role     int32  `json:"role"`
-	jwt.RegisteredClaims
 }
 
-var jwtSecret = []byte(utils.GetEnv("JWT_SECRET", "Jwt-Secret-Cho-Khoa-Hoc-Lap-Trinh-Golang"))
+var (
+	jwtSecret     = []byte(utils.GetEnv("JWT_SECRET", "Jwt-Secret-Cho-Khoa-Hoc-Lap-Trinh-Golang"))
+	jwtEncryptKey = []byte(utils.GetEnv("JWT_ENCRYPT_KEY", "12345678901234567890123456789012"))
+)
 
 const (
 	AccessTokenTTL = 15 * time.Minute
@@ -30,16 +33,28 @@ func NewJWTService() *JWTService {
 }
 
 func (js *JWTService) GenerateAccessToken(user sqlc.User) (string, error) {
-	claims := &Claims{
+	payload := &EncryptedPayload{
 		UserUUID: user.UserUuid.String(),
 		Email:    user.UserEmail,
 		Role:     user.UserLevel,
-		RegisteredClaims: jwt.RegisteredClaims{
-			ID:        uuid.NewString(),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(AccessTokenTTL)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "khoa-hoc-lap-trinh-golang",
-		},
+	}
+
+	rawData, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	encrypted, err := utils.EncryptAES(rawData, jwtEncryptKey)
+	if err != nil {
+		return "", err
+	}
+
+	claims := jwt.MapClaims{
+		"data": encrypted,
+		"jti":  uuid.NewString(),
+		"exp":  time.Now().Add(AccessTokenTTL).Unix(),
+		"iat":  time.Now().Unix(),
+		"iss":  "khoa-hoc-lap-trinh-golang",
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

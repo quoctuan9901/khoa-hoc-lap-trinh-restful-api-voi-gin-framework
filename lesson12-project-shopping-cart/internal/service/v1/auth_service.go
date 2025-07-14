@@ -21,28 +21,36 @@ func NewAuthService(repo repository.UserRepository, tokenService auth.TokenServi
 	}
 }
 
-func (as *authService) Login(ctx *gin.Context, email, password string) (string, int, error) {
+func (as *authService) Login(ctx *gin.Context, email, password string) (string, string, int, error) {
 	context := ctx.Request.Context()
 
 	email = utils.NormalizeString(email)
 	user, err := as.userRepo.GetByEmail(context, email)
 	if err != nil {
-		return "", 0, utils.NewError("Invalid email or password", utils.ErrCodeUnauthorized)
+		return "", "", 0, utils.NewError("Invalid email or password", utils.ErrCodeUnauthorized)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.UserPassword), []byte(password)); err != nil {
-		return "", 0, utils.NewError("Invalid email or password", utils.ErrCodeUnauthorized)
+		return "", "", 0, utils.NewError("Invalid email or password", utils.ErrCodeUnauthorized)
 	}
 
 	accessToken, err := as.tokenService.GenerateAccessToken(user)
 	if err != nil {
-		return "", 0, utils.WrapError(err, "Unable to create access token", utils.ErrCodeInternal)
+		return "", "", 0, utils.WrapError(err, "Unable to create access token", utils.ErrCodeInternal)
 	}
 
-	return accessToken, int(auth.AccessTokenTTL.Seconds()), nil
+	refreshToken, err := as.tokenService.GenerateRefreshToken(user)
+	if err != nil {
+		return "", "", 0, utils.WrapError(err, "Unable to create access token", utils.ErrCodeInternal)
+	}
+
+	if err := as.tokenService.StoreRefreshToken(refreshToken); err != nil {
+		return "", "", 0, utils.WrapError(err, "Cannot save refresh token", utils.ErrCodeInternal)
+	}
+
+	return accessToken, refreshToken.Token, int(auth.AccessTokenTTL.Seconds()), nil
 }
 
 func (as *authService) Logout(ctx *gin.Context) error {
-
 	return nil
 }

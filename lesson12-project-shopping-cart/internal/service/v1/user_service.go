@@ -21,7 +21,7 @@ import (
 
 type userService struct {
 	repo  repository.UserRepository
-	cache *cache.RedisCacheService
+	cache cache.RedisCacheService
 }
 
 func NewUserService(repo repository.UserRepository, redisClient *redis.Client) UserService {
@@ -65,7 +65,6 @@ func (us *userService) GetAllUsers(ctx *gin.Context, search, orderBy, sort strin
 
 	offset := (page - 1) * limit
 
-	
 	users, err := us.repo.GetAllV2(context, search, orderBy, sort, limit, offset, deleted)
 	if err != nil {
 		return []sqlc.User{}, 0, utils.WrapError(err, "failed to fetch users", utils.ErrCodeInternal)

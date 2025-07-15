@@ -1,9 +1,12 @@
 package v1service
 
 import (
+	"strings"
+	"time"
 	"user-management-api/internal/repository"
 	"user-management-api/internal/utils"
 	"user-management-api/pkg/auth"
+	"user-management-api/pkg/cache"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -13,12 +16,14 @@ import (
 type authService struct {
 	userRepo     repository.UserRepository
 	tokenService auth.TokenService
+	cache        cache.RedisCacheService
 }
 
-func NewAuthService(repo repository.UserRepository, tokenService auth.TokenService) *authService {
+func NewAuthService(repo repository.UserRepository, tokenService auth.TokenService, cache cache.RedisCacheService) *authService {
 	return &authService{
 		userRepo:     repo,
 		tokenService: tokenService,
+		cache:        cache,
 	}
 }
 
@@ -52,7 +57,36 @@ func (as *authService) Login(ctx *gin.Context, email, password string) (string, 
 	return accessToken, refreshToken.Token, int(auth.AccessTokenTTL.Seconds()), nil
 }
 
-func (as *authService) Logout(ctx *gin.Context) error {
+func (as *authService) Logout(ctx *gin.Context, refreshToken string) error {
+	authHeader := ctx.GetHeader("Authorization")
+	if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		return utils.NewError("Missing Authorization header", utils.ErrCodeUnauthorized)
+	}
+
+	accessToken := strings.TrimPrefix(authHeader, "Bearer ")
+
+	_, claims, err := as.tokenService.ParseToken(accessToken)
+	if err != nil {
+		return utils.NewError("Invalid access token", utils.ErrCodeUnauthorized)
+	}
+
+	if jti, ok := claims["jti"].(string); ok {
+		expUnix, _ := claims["exp"].(float64)
+		exp := time.Unix(int64(expUnix), 0)
+		key := "blacklist:" + jti
+		ttl := time.Until(exp)
+		as.cache.Set(key, "revoked", ttl)
+	}
+
+	_, err = as.tokenService.ValidateRefreshToken(refreshToken)
+	if err != nil {
+		return utils.NewError("Refresh token is invalid or revoked", utils.ErrCodeUnauthorized)
+	}
+
+	if err := as.tokenService.RevokeRefreshToken(refreshToken); err != nil {
+		return utils.WrapError(err, "Unable to revoke token", utils.ErrCodeInternal)
+	}
+
 	return nil
 }
 

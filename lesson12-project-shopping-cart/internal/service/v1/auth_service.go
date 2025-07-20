@@ -2,6 +2,7 @@ package v1service
 
 import (
 	"strings"
+	"sync"
 	"time"
 	"user-management-api/internal/repository"
 	"user-management-api/internal/utils"
@@ -11,6 +12,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+	"golang.org/x/time/rate"
 )
 
 type authService struct {
@@ -18,6 +20,18 @@ type authService struct {
 	tokenService auth.TokenService
 	cache        cache.RedisCacheService
 }
+
+type LoginAttempt struct {
+	limiter  *rate.Limiter
+	lastSeen time.Time
+}
+
+var (
+	mu              sync.Mutex
+	clients         = make(map[string]*LoginAttempt)
+	LoginAttemptTTL = 5 * time.Minute
+	MaxLoginAttempt = 5
+)
 
 func NewAuthService(repo repository.UserRepository, tokenService auth.TokenService, cache cache.RedisCacheService) *authService {
 	return &authService{
@@ -27,16 +41,64 @@ func NewAuthService(repo repository.UserRepository, tokenService auth.TokenServi
 	}
 }
 
+func (as *authService) getClientIP(ctx *gin.Context) string {
+	ip := ctx.ClientIP()
+	if ip == "" {
+		ip = ctx.Request.RemoteAddr
+	}
+
+	return ip
+}
+
+func (as *authService) getLoginAttempt(ip string) *rate.Limiter {
+	mu.Lock()
+	defer mu.Unlock()
+
+	client, exists := clients[ip]
+	if !exists {
+		limiter := rate.NewLimiter(rate.Limit(float32(MaxLoginAttempt)/float32(LoginAttemptTTL.Seconds())), MaxLoginAttempt)
+		newClient := &LoginAttempt{limiter, time.Now()}
+		clients[ip] = newClient
+		return limiter
+	}
+
+	client.lastSeen = time.Now()
+	return client.limiter
+}
+
+func (as *authService) checkLoginAttempt(ip string) error {
+	limiter := as.getLoginAttempt(ip)
+
+	if !limiter.Allow() {
+		return utils.NewError("Too many login attempts. Please retry again later", utils.ErrCodeTooManyRequests)
+	}
+
+	return nil
+}
+
+func (as *authService) CleanupClients(ip string) {
+	mu.Lock()
+	defer mu.Unlock()
+	delete(clients, ip)
+}
+
 func (as *authService) Login(ctx *gin.Context, email, password string) (string, string, int, error) {
 	context := ctx.Request.Context()
+	ip := as.getClientIP(ctx)
+
+	if err := as.checkLoginAttempt(ip); err != nil {
+		return "", "", 0, err
+	}
 
 	email = utils.NormalizeString(email)
 	user, err := as.userRepo.GetByEmail(context, email)
 	if err != nil {
+		as.getLoginAttempt(ip)
 		return "", "", 0, utils.NewError("Invalid email or password", utils.ErrCodeUnauthorized)
 	}
 
 	if err := bcrypt.CompareHashAndPassword([]byte(user.UserPassword), []byte(password)); err != nil {
+		as.getLoginAttempt(ip)
 		return "", "", 0, utils.NewError("Invalid email or password", utils.ErrCodeUnauthorized)
 	}
 
@@ -53,6 +115,8 @@ func (as *authService) Login(ctx *gin.Context, email, password string) (string, 
 	if err := as.tokenService.StoreRefreshToken(refreshToken); err != nil {
 		return "", "", 0, utils.WrapError(err, "Cannot save refresh token", utils.ErrCodeInternal)
 	}
+
+	as.CleanupClients(ip)
 
 	return accessToken, refreshToken.Token, int(auth.AccessTokenTTL.Seconds()), nil
 }

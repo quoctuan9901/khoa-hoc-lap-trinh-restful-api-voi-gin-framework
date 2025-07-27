@@ -13,9 +13,16 @@ importdb:
 exportdb:
 	docker exec -i postgres-db pg_dump -U root -d master-golang > ./backupdb-master-golang.sql
 
+# Build a binary file
+build:
+	go build -o bin/myapp ./cmd/api
+
+run-binary:
+	./bin/myapp
+
 # Run server
 server:
-	cd cmd/api && go run .
+	go run ./cmd/api
 
 # Generate sqlc
 sqlc:
@@ -49,4 +56,4 @@ migrate-drop:
 migrate-goto:
 	migrate -path $(MIGRATION_DIRS) -database "$(CONN_STRING)" goto $(VERSION)
 
-.PHONY: importdb exportdb server migrate-create migrate-up migrate-down migrate-force migrate-drop migrate-goto migrate-down-n sqlc
+.PHONY: importdb exportdb server migrate-create migrate-up migrate-down migrate-force migrate-drop migrate-goto migrate-down-n sqlc build run-binary

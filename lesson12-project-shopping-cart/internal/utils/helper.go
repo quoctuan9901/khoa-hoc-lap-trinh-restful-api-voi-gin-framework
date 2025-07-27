@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"log"
 	"os"
+	"path/filepath"
 	"strconv"
 	"user-management-api/pkg/logger"
 
@@ -30,7 +32,14 @@ func GetIntEnv(key string, defaultValue int) int {
 	return intVal
 }
 
-func NewLoggerWithPath(path string, level string) *zerolog.Logger {
+func NewLoggerWithPath(fileName string, level string) *zerolog.Logger {
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal("❌ Unable to get working dir:", err)
+	}
+
+	path := filepath.Join(cwd, "internal/logs", fileName)
+
 	config := logger.LoggerConfig{
 		Level:      level,
 		Filename:   path,

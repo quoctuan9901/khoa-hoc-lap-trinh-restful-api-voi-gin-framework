@@ -3,11 +3,11 @@ package db
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 	"user-management-api/internal/config"
 	"user-management-api/internal/db/sqlc"
 	"user-management-api/internal/utils"
+	"user-management-api/pkg/logger"
 	"user-management-api/pkg/pgx"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -55,7 +55,7 @@ func InitDB() error {
 		return fmt.Errorf("db ping error: %v", err)
 	}
 
-	log.Println("🍺 Connected Database Postgresql")
+	logger.Log.Info().Msg("🍺 Connected Database Postgresql")
 
 	return nil
 }

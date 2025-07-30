@@ -4,13 +4,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"log"
 	"strings"
 	"time"
 	"user-management-api/internal/db/sqlc"
 	"user-management-api/internal/repository"
 	"user-management-api/internal/utils"
 	"user-management-api/pkg/cache"
+	"user-management-api/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -112,7 +112,7 @@ func (us *userService) CreateUser(ctx *gin.Context, input sqlc.CreateUserParams)
 
 	// Clear cache redis
 	if err := us.cache.Clear("users:*"); err != nil {
-		log.Printf("Failed to clear cache: %v", err)
+		logger.Log.Warn().Err(err).Msg("Failed to clear cache")
 	}
 
 	return user, nil
@@ -158,7 +158,7 @@ func (us *userService) UpdateUser(ctx *gin.Context, input sqlc.UpdateUserParams)
 
 	// Clear cache redis
 	if err := us.cache.Clear("users:*"); err != nil {
-		log.Printf("Failed to clear cache: %v", err)
+		logger.Log.Warn().Err(err).Msg("Failed to clear cache")
 	}
 
 	return updatedUser, nil
@@ -178,7 +178,7 @@ func (us *userService) SoftDeleteUser(ctx *gin.Context, uuid uuid.UUID) (sqlc.Us
 
 	// Clear cache redis
 	if err := us.cache.Clear("users:*"); err != nil {
-		log.Printf("Failed to clear cache: %v", err)
+		logger.Log.Warn().Err(err).Msg("Failed to clear cache")
 	}
 
 	return softDeleteUser, nil
@@ -198,7 +198,7 @@ func (us *userService) RestoreUser(ctx *gin.Context, uuid uuid.UUID) (sqlc.User,
 
 	// Clear cache redis
 	if err := us.cache.Clear("users:*"); err != nil {
-		log.Printf("Failed to clear cache: %v", err)
+		logger.Log.Warn().Err(err).Msg("Failed to clear cache")
 	}
 
 	return restoreUser, nil
@@ -218,7 +218,7 @@ func (us *userService) DeleteUser(ctx *gin.Context, uuid uuid.UUID) error {
 
 	// Clear cache redis
 	if err := us.cache.Clear("users:*"); err != nil {
-		log.Printf("Failed to clear cache: %v", err)
+		logger.Log.Warn().Err(err).Msg("Failed to clear cache")
 	}
 
 	return nil

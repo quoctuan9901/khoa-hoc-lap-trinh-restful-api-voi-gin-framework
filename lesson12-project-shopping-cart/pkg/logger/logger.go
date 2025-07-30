@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"io"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/natefinch/lumberjack"
@@ -16,6 +17,8 @@ type contextKey string
 
 const TraceIdKey contextKey = "trace_id"
 
+var Log *zerolog.Logger
+
 type LoggerConfig struct {
 	Level      string
 	Filename   string
@@ -24,6 +27,10 @@ type LoggerConfig struct {
 	MaxAge     int
 	Compress   bool
 	IsDev      string
+}
+
+func InitLogger(config LoggerConfig) {
+	Log = NewLogger(config)
 }
 
 func NewLogger(config LoggerConfig) *zerolog.Logger {
@@ -38,7 +45,11 @@ func NewLogger(config LoggerConfig) *zerolog.Logger {
 	var writer io.Writer
 
 	if config.IsDev == "development" {
-		writer = PrettyJSONWriter{Writer: os.Stdout}
+		if strings.Contains(config.Filename, "app.log") {
+			writer = zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339}
+		} else {
+			writer = PrettyJSONWriter{Writer: os.Stdout}
+		}
 	} else {
 		writer = &lumberjack.Logger{
 			Filename:   config.Filename,

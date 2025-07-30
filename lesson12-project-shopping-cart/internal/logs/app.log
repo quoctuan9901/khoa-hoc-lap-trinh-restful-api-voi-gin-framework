@@ -1,0 +1,10 @@
+{"level":"info","time":"2025-07-30T09:52:00+07:00","message":"✅ Loaded successfully .env"}
+{"level":"info","time":"2025-07-30T09:52:00+07:00","message":"🍺 Connected Database Postgresql"}
+{"level":"info","time":"2025-07-30T09:52:00+07:00","message":"🍺 Connected Redis"}
+{"level":"info","time":"2025-07-30T09:52:00+07:00","message":"✅ Server is running at :8080"}
+{"level":"warn","time":"2025-07-30T09:52:50+07:00","message":"⚠️  Shutdown signal received ..."}
+{"level":"info","time":"2025-07-30T09:52:50+07:00","message":"🍺 Server exited gracefully"}
+{"level":"info","time":"2025-07-30T02:54:41Z","message":"✅ Loaded successfully .env"}
+{"level":"info","time":"2025-07-30T02:54:41Z","message":"🍺 Connected Database Postgresql"}
+{"level":"info","time":"2025-07-30T02:54:41Z","message":"🍺 Connected Redis"}
+{"level":"info","time":"2025-07-30T02:54:41Z","message":"✅ Server is running at :8080"}

@@ -96,7 +96,7 @@ func (a *Application) Run() error {
 	}
 
 	logger.Log.Info().Msg("🍺 Server exited gracefully")
-	
+
 	return nil
 }
 

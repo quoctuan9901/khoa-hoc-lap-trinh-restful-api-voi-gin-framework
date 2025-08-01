@@ -1,6 +1,7 @@
 package v1service
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 	"time"
@@ -8,6 +9,7 @@ import (
 	"user-management-api/internal/utils"
 	"user-management-api/pkg/auth"
 	"user-management-api/pkg/cache"
+	"user-management-api/pkg/logger"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -18,7 +20,7 @@ import (
 type authService struct {
 	userRepo     repository.UserRepository
 	tokenService auth.TokenService
-	cache        cache.RedisCacheService
+	cacheService cache.RedisCacheService
 }
 
 type LoginAttempt struct {
@@ -33,11 +35,11 @@ var (
 	MaxLoginAttempt = 5
 )
 
-func NewAuthService(repo repository.UserRepository, tokenService auth.TokenService, cache cache.RedisCacheService) *authService {
+func NewAuthService(repo repository.UserRepository, tokenService auth.TokenService, cacheService cache.RedisCacheService) *authService {
 	return &authService{
 		userRepo:     repo,
 		tokenService: tokenService,
-		cache:        cache,
+		cacheService: cacheService,
 	}
 }
 
@@ -139,7 +141,7 @@ func (as *authService) Logout(ctx *gin.Context, refreshToken string) error {
 		exp := time.Unix(int64(expUnix), 0)
 		key := "blacklist:" + jti
 		ttl := time.Until(exp)
-		as.cache.Set(key, "revoked", ttl)
+		as.cacheService.Set(key, "revoked", ttl)
 	}
 
 	_, err = as.tokenService.ValidateRefreshToken(refreshToken)
@@ -187,4 +189,39 @@ func (as *authService) RefreshToken(ctx *gin.Context, refreshTokenString string)
 	}
 
 	return accessToken, refreshToken.Token, int(auth.AccessTokenTTL.Seconds()), nil
+}
+
+func (as *authService) RequestForgotPassword(ctx *gin.Context, email string) error {
+	context := ctx.Request.Context()
+
+	rateLimitKey := fmt.Sprintf("reset:ratelimit:%s", email)
+	if exists, err := as.cacheService.Exists(rateLimitKey); err == nil && exists {
+		return utils.NewError("Please wait before requesting anothoer password reset", utils.ErrCodeTooManyRequests)
+	}
+
+	user, err := as.userRepo.GetByEmail(context, email)
+	if err != nil {
+		return utils.NewError("Email not found", utils.ErrCodeNotFound)
+	}
+
+	token, err := utils.GenerateRandomString(16)
+	if err != nil {
+		return utils.NewError("Failed to generate reset token", utils.ErrCodeInternal)
+	}
+
+	err = as.cacheService.Set("reset:"+token, user.UserUuid, time.Hour)
+	if err != nil {
+		return utils.NewError("Failed to store reset token", utils.ErrCodeInternal)
+	}
+
+	err = as.cacheService.Set(rateLimitKey, "1", 10*time.Second)
+	if err != nil {
+		return utils.NewError("Failed to store rate limit reset password", utils.ErrCodeInternal)
+	}
+
+	resetLink := fmt.Sprintf("http://abc.com/view-to-reset-password?token=%s", token)
+
+	logger.Log.Info().Msg(resetLink)
+
+	return nil
 }

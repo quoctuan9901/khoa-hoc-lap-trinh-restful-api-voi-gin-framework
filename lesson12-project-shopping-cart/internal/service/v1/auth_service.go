@@ -214,7 +214,7 @@ func (as *authService) RequestForgotPassword(ctx *gin.Context, email string) err
 		return utils.NewError("Failed to store reset token", utils.ErrCodeInternal)
 	}
 
-	err = as.cacheService.Set(rateLimitKey, "1", 10*time.Second)
+	err = as.cacheService.Set(rateLimitKey, "1", 5*time.Minute)
 	if err != nil {
 		return utils.NewError("Failed to store rate limit reset password", utils.ErrCodeInternal)
 	}

@@ -74,7 +74,7 @@ func (ur *SqlUserRepository) GetAllV2(ctx context.Context, search, orderBy, sort
 	} else {
 		query += " AND user_deleted_at IS NULL"
 	}
-	
+
 	order := "ASC"
 	if sort == "desc" {
 		order = "DESC"
@@ -124,10 +124,10 @@ func (ur *SqlUserRepository) GetAllV2(ctx context.Context, search, orderBy, sort
 
 func (ur *SqlUserRepository) CountUsers(ctx context.Context, search string, deleted bool) (int64, error) {
 	total, err := ur.db.CountUsers(ctx, sqlc.CountUsersParams{
-		Search: search,
+		Search:  search,
 		Deleted: &deleted,
 	})
-	
+
 	if err != nil {
 		return 0, err
 	}
@@ -188,7 +188,7 @@ func (ur *SqlUserRepository) Delete(ctx context.Context, uuid uuid.UUID) (sqlc.U
 	return user, nil
 }
 
-func (ur *SqlUserRepository) GetByEmail(ctx context.Context, email string)  (sqlc.User, error) {
+func (ur *SqlUserRepository) GetByEmail(ctx context.Context, email string) (sqlc.User, error) {
 	user, err := ur.db.GetUserByEmail(ctx, email)
 	if err != nil {
 		return sqlc.User{}, err
@@ -196,4 +196,13 @@ func (ur *SqlUserRepository) GetByEmail(ctx context.Context, email string)  (sql
 
 	return user, nil
 
+}
+
+func (ur *SqlUserRepository) UpdatePassword(ctx context.Context, input sqlc.UpdatePasswordParams) (sqlc.User, error) {
+	user, err := ur.db.UpdatePassword(ctx, input)
+	if err != nil {
+		return sqlc.User{}, err
+	}
+
+	return user, nil
 }

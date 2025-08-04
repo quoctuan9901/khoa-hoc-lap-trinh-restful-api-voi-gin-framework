@@ -5,6 +5,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"user-management-api/internal/db/sqlc"
 	"user-management-api/internal/repository"
 	"user-management-api/internal/utils"
 	"user-management-api/pkg/auth"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"github.com/redis/go-redis/v9"
 	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/time/rate"
 )
@@ -222,6 +224,44 @@ func (as *authService) RequestForgotPassword(ctx *gin.Context, email string) err
 	resetLink := fmt.Sprintf("http://abc.com/view-to-reset-password?token=%s", token)
 
 	logger.Log.Info().Msg(resetLink)
+
+	return nil
+}
+
+func (as *authService) ResetPassword(ctx *gin.Context, token, password string) error {
+	context := ctx.Request.Context()
+
+	var userUUIDStr string
+	err := as.cacheService.Get("reset:"+token, &userUUIDStr)
+	if err == redis.Nil || userUUIDStr == "" {
+		return utils.NewError("Invalid or expired token", utils.ErrCodeNotFound)
+	}
+
+	if err != nil {
+		return utils.NewError("Failed to get reset token", utils.ErrCodeInternal)
+	}
+
+	userUuid, err := uuid.Parse(userUUIDStr)
+	if err != nil {
+		return utils.WrapError(err, "Uuid is invalid", utils.ErrCodeInternal)
+	}
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return utils.WrapError(err, "Failed to hash passowrd", utils.ErrCodeInternal)
+	}
+
+	input := sqlc.UpdatePasswordParams{
+		UserPassword: string(hashedPassword),
+		UserUuid:     userUuid,
+	}
+
+	_, err = as.userRepo.UpdatePassword(context, input)
+	if err != nil {
+		return utils.NewError("Failed to update new password", utils.ErrCodeInternal)
+	}
+
+	as.cacheService.Clear("reset:" + token)
 
 	return nil
 }

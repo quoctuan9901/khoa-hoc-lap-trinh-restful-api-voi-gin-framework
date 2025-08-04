@@ -11,6 +11,7 @@ import (
 	"user-management-api/pkg/auth"
 	"user-management-api/pkg/cache"
 	"user-management-api/pkg/logger"
+	"user-management-api/pkg/mail"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -23,6 +24,7 @@ type authService struct {
 	userRepo     repository.UserRepository
 	tokenService auth.TokenService
 	cacheService cache.RedisCacheService
+	mailService  mail.EmailProviderService
 }
 
 type LoginAttempt struct {
@@ -37,11 +39,12 @@ var (
 	MaxLoginAttempt = 5
 )
 
-func NewAuthService(repo repository.UserRepository, tokenService auth.TokenService, cacheService cache.RedisCacheService) *authService {
+func NewAuthService(repo repository.UserRepository, tokenService auth.TokenService, cacheService cache.RedisCacheService, mailService mail.EmailProviderService) *authService {
 	return &authService{
 		userRepo:     repo,
 		tokenService: tokenService,
 		cacheService: cacheService,
+		mailService:  mailService,
 	}
 }
 

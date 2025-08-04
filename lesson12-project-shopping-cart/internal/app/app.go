@@ -11,10 +11,12 @@ import (
 	"user-management-api/internal/db"
 	"user-management-api/internal/db/sqlc"
 	"user-management-api/internal/routes"
+	"user-management-api/internal/utils"
 	"user-management-api/internal/validation"
 	"user-management-api/pkg/auth"
 	"user-management-api/pkg/cache"
 	"user-management-api/pkg/logger"
+	"user-management-api/pkg/mail"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -49,6 +51,16 @@ func NewApplication(cfg *config.Config) *Application {
 	redisClient := config.NewRedisClient()
 	cacheRedisService := cache.NewRedisCacheService(redisClient)
 	tokenService := auth.NewJWTService(cacheRedisService)
+	mailLogger := utils.NewLoggerWithPath("mail.log", "info")
+	factory, err := mail.NewProviderFactory(mail.ProviderMailtrap)
+	if err != nil {
+		mailLogger.Error().Err(err).Msg("Failed to create mail provider factory")
+	}
+
+	mailService, err := mail.NewMailService(cfg, mailLogger, factory)
+	if err != nil {
+		mailLogger.Error().Err(err).Msg("Failed to initialize mail service")
+	}
 
 	ctx := &ModuleContext{
 		DB:    db.DB,
@@ -57,7 +69,7 @@ func NewApplication(cfg *config.Config) *Application {
 
 	modules := []Module{
 		NewUserModule(ctx),
-		NewAuthModule(ctx, tokenService, cacheRedisService),
+		NewAuthModule(ctx, tokenService, cacheRedisService, mailService),
 	}
 
 	routes.RegisterRoutes(r, tokenService, cacheRedisService, getModulRoutes(modules)...)

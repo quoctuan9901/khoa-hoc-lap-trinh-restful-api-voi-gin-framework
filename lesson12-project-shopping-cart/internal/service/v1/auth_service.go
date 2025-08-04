@@ -10,7 +10,6 @@ import (
 	"user-management-api/internal/utils"
 	"user-management-api/pkg/auth"
 	"user-management-api/pkg/cache"
-	"user-management-api/pkg/logger"
 	"user-management-api/pkg/mail"
 
 	"github.com/gin-gonic/gin"
@@ -226,7 +225,19 @@ func (as *authService) RequestForgotPassword(ctx *gin.Context, email string) err
 
 	resetLink := fmt.Sprintf("http://abc.com/view-to-reset-password?token=%s", token)
 
-	logger.Log.Info().Msg(resetLink)
+	mailContent := &mail.Email{
+		To: []mail.Address{
+			{Email: email},
+		},
+		Subject: "Password Reset Request",
+		Text: fmt.Sprintf("Hi %s, \n\n You requested to reset your password. Please click the link below to reset it:\n%s\n\n The link will expire in 1 hour. \n\n Best regard, \nCode With Tuan Team",
+			user.UserEmail,
+			resetLink),
+	}
+
+	if err := as.mailService.SendMail(ctx, mailContent); err != nil {
+		return utils.NewError("Failed to send passwod reset email", utils.ErrCodeInternal)
+	}
 
 	return nil
 }

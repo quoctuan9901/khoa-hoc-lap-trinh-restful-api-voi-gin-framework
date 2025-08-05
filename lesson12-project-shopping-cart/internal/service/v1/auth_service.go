@@ -235,7 +235,7 @@ func (as *authService) RequestForgotPassword(ctx *gin.Context, email string) err
 			resetLink),
 	}
 
-	if err := as.mailService.SendMail(ctx, mailContent); err != nil {
+	if err := as.mailService.SendMail(context, mailContent); err != nil {
 		return utils.NewError("Failed to send passwod reset email", utils.ErrCodeInternal)
 	}
 

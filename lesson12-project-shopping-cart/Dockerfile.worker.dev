@@ -1,0 +1,11 @@
+FROM golang:1.24.5-alpine AS builder
+
+RUN apk update && apk add --no-cache git curl
+
+RUN go install github.com/air-verse/air@latest
+
+WORKDIR /app
+
+COPY . .
+
+CMD ["air", "-c", ".air.worker.toml"]

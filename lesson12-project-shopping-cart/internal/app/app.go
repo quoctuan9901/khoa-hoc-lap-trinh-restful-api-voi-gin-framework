@@ -37,9 +37,10 @@ type ModuleContext struct {
 	Redis *redis.Client
 }
 
-func NewApplication(cfg *config.Config) *Application {
+func NewApplication(cfg *config.Config) (*Application, error) {
 	if err := validation.InitValidator(); err != nil {
 		logger.Log.Fatal().Err(err).Msg("Validator init failed")
+		return nil, err
 	}
 
 	r := gin.Default()
@@ -55,11 +56,13 @@ func NewApplication(cfg *config.Config) *Application {
 	factory, err := mail.NewProviderFactory(mail.ProviderMailtrap)
 	if err != nil {
 		mailLogger.Error().Err(err).Msg("Failed to create mail provider factory")
+		return nil, err
 	}
 
 	mailService, err := mail.NewMailService(cfg, mailLogger, factory)
 	if err != nil {
 		mailLogger.Error().Err(err).Msg("Failed to initialize mail service")
+		return nil, err
 	}
 
 	ctx := &ModuleContext{
@@ -78,7 +81,7 @@ func NewApplication(cfg *config.Config) *Application {
 		config:  cfg,
 		router:  r,
 		modules: modules,
-	}
+	}, nil
 }
 
 func (a *Application) Run() error {

@@ -62,3 +62,11 @@ func GenerateRandomString(length int) (string, error) {
 
 	return base64.URLEncoding.EncodeToString(bytes), nil
 }
+
+func MustGetWorkingDir() string {
+	dir, err := os.Getwd()
+	if err != nil {
+		log.Fatal("❌ Unable to get working dir:", err)
+	}
+	return dir
+}

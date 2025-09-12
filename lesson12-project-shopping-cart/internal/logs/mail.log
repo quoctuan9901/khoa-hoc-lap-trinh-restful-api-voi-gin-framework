@@ -13,3 +13,4 @@
 {"level":"error","trace_id":"907c4aec-cd41-45a7-8731-ae4e99a49300","duration":485.271284,"operation":"send_mail","status_code":403,"response_body":"{\"success\":false,\"errors\":[\"Too many failed login attempts\"]}","time":"2025-08-05T02:28:36Z","message":"Unexpected response from mailtrap"}
 {"level":"warn","trace_id":"907c4aec-cd41-45a7-8731-ae4e99a49300","duration":491.675286,"operation":"send_mail","attempt":3,"error":"","time":"2025-08-05T02:28:36Z","message":"Failed to send email, retrying"}
 {"level":"error","trace_id":"907c4aec-cd41-45a7-8731-ae4e99a49300","duration":8884.691688,"operation":"send_mail","attempt":3,"error":"","time":"2025-08-05T02:28:39Z","message":"Failed to send email after all retries"}
+{"level":"info","trace_id":"","duration":6266.430929,"operation":"send_mail","to":[{"email":"contact.quoctuan@gmail.com"}],"subject":"Password Reset Request","category":"","time":"2025-09-12T04:19:34Z","message":"Email send successfully"}

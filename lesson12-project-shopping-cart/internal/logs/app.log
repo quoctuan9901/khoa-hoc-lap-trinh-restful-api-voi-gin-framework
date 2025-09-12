@@ -290,3 +290,8 @@
 {"level":"info","time":"2025-08-05T04:06:06Z","message":"🍺 Connected Database Postgresql"}
 {"level":"info","time":"2025-08-05T04:06:06Z","message":"🍺 Connected Redis"}
 {"level":"info","time":"2025-08-05T04:06:06Z","message":"✅ Server is running at :8080"}
+{"level":"info","time":"2025-09-12T04:19:04Z","message":"✅ Loaded successfully .env in worker proccess"}
+{"level":"info","time":"2025-09-12T04:19:04Z","message":"✅ Loaded successfully .env in api proccess"}
+{"level":"info","time":"2025-09-12T04:19:04Z","message":"🍺 Connected Database Postgresql"}
+{"level":"info","time":"2025-09-12T04:19:04Z","message":"🍺 Connected Redis"}
+{"level":"info","time":"2025-09-12T04:19:04Z","message":"✅ Server is running at :8080"}

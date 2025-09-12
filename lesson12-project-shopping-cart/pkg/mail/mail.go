@@ -67,7 +67,7 @@ func (ms *MailService) SendMail(ctx context.Context, email *Email) error {
 		startAttempt := time.Now()
 		err := ms.provder.SendMail(ctx, email)
 		if err == nil {
-			ms.logger.Error().Str("trace_id", traceID).
+			ms.logger.Info().Str("trace_id", traceID).
 				Dur("duration", time.Since(startAttempt)).
 				Str("operation", "send_mail").
 				Interface("to", email.To).

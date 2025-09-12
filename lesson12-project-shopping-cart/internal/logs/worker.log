@@ -1,0 +1,2 @@
+{"level":"info","time":"2025-09-12T04:19:04Z","message":"Worker started, consuming from queue: auth_email_queue"}
+{"level":"info","time":"2025-09-12T04:19:34Z","message":"Email sent successfully to [{contact.quoctuan@gmail.com }]"}

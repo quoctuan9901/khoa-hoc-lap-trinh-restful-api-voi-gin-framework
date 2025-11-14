@@ -295,3 +295,28 @@
 {"level":"info","time":"2025-09-12T04:19:04Z","message":"🍺 Connected Database Postgresql"}
 {"level":"info","time":"2025-09-12T04:19:04Z","message":"🍺 Connected Redis"}
 {"level":"info","time":"2025-09-12T04:19:04Z","message":"✅ Server is running at :8080"}
+{"level":"info","time":"2025-09-12T10:28:40Z","message":"✅ Loaded successfully .env in worker proccess"}
+{"level":"info","time":"2025-09-12T10:28:40Z","message":"✅ Loaded successfully .env in api proccess"}
+{"level":"info","time":"2025-09-12T10:28:40Z","message":"🍺 Connected Database Postgresql"}
+{"level":"info","time":"2025-09-12T10:28:40Z","message":"🍺 Connected Redis"}
+{"level":"info","time":"2025-09-12T10:28:40Z","message":"✅ Server is running at :8080"}
+{"level":"info","time":"2025-09-12T10:30:39Z","message":"✅ Loaded successfully .env in worker proccess"}
+{"level":"info","time":"2025-09-12T10:30:40Z","message":"✅ Loaded successfully .env in api proccess"}
+{"level":"info","time":"2025-09-12T10:30:40Z","message":"🍺 Connected Database Postgresql"}
+{"level":"info","time":"2025-09-12T10:30:40Z","message":"🍺 Connected Redis"}
+{"level":"info","time":"2025-09-12T10:30:40Z","message":"✅ Server is running at :8080"}
+{"level":"info","time":"2025-09-19T00:50:50Z","message":"✅ Loaded successfully .env in worker proccess"}
+{"level":"info","time":"2025-09-19T00:50:50Z","message":"✅ Loaded successfully .env in api proccess"}
+{"level":"info","time":"2025-09-19T00:50:50Z","message":"🍺 Connected Database Postgresql"}
+{"level":"info","time":"2025-09-19T00:50:50Z","message":"🍺 Connected Redis"}
+{"level":"info","time":"2025-09-19T00:50:50Z","message":"✅ Server is running at :8080"}
+{"level":"info","time":"2025-10-25T02:06:42Z","message":"✅ Loaded successfully .env in worker proccess"}
+{"level":"info","time":"2025-10-25T02:06:42Z","message":"✅ Loaded successfully .env in api proccess"}
+{"level":"info","time":"2025-10-25T02:06:42Z","message":"🍺 Connected Database Postgresql"}
+{"level":"info","time":"2025-10-25T02:06:42Z","message":"🍺 Connected Redis"}
+{"level":"info","time":"2025-10-25T02:06:42Z","message":"✅ Server is running at :8080"}
+{"level":"info","time":"2025-11-14T07:46:13Z","message":"✅ Loaded successfully .env in worker proccess"}
+{"level":"info","time":"2025-11-14T07:46:18Z","message":"✅ Loaded successfully .env in api proccess"}
+{"level":"info","time":"2025-11-14T07:46:18Z","message":"🍺 Connected Database Postgresql"}
+{"level":"info","time":"2025-11-14T07:46:18Z","message":"🍺 Connected Redis"}
+{"level":"info","time":"2025-11-14T07:46:18Z","message":"✅ Server is running at :8080"}

@@ -1,2 +1,11 @@
 {"level":"info","time":"2025-09-12T04:19:04Z","message":"Worker started, consuming from queue: auth_email_queue"}
 {"level":"info","time":"2025-09-12T04:19:34Z","message":"Email sent successfully to [{contact.quoctuan@gmail.com }]"}
+{"level":"info","time":"2025-09-12T10:28:40Z","message":"Worker started, consuming from queue: auth_email_queue"}
+{"level":"info","time":"2025-09-12T10:30:39Z","message":"Worker started, consuming from queue: auth_email_queue"}
+{"level":"error","error":"dial tcp 172.18.0.6:5672: connect: connection refused","time":"2025-09-19T00:50:50Z","message":"failed to connect to RabbitMQ"}
+{"level":"fatal","error":"dial tcp 172.18.0.6:5672: connect: connection refused","time":"2025-09-19T00:50:50Z","message":"Failed to init RabbitMQ service"}
+{"level":"error","error":"dial tcp 172.18.0.6:5672: connect: connection refused","time":"2025-09-19T00:50:50Z","message":"failed to connect to RabbitMQ"}
+{"level":"error","error":"dial tcp 172.18.0.6:5672: connect: connection refused","time":"2025-10-25T02:06:42Z","message":"failed to connect to RabbitMQ"}
+{"level":"fatal","error":"dial tcp 172.18.0.6:5672: connect: connection refused","time":"2025-10-25T02:06:42Z","message":"Failed to init RabbitMQ service"}
+{"level":"error","error":"dial tcp 172.18.0.6:5672: connect: connection refused","time":"2025-10-25T02:06:42Z","message":"failed to connect to RabbitMQ"}
+{"level":"info","time":"2025-11-14T07:46:13Z","message":"Worker started, consuming from queue: auth_email_queue"}
